@@ -10,15 +10,28 @@ import Message from 'primevue/message'
 import ProgressSpinner from 'primevue/progressspinner'
 import BondService from '@/service/BondService'
 import { useAuth } from '@/composables/useAuth'
+import MenuBar from '@/components/MenuBar.vue'
 
 const router = useRouter()
-const { user, isAuthenticated, getUserId, logout } = useAuth()
+const { user, isAuthenticated, getUserId } = useAuth()
 
 // Estados
 const bonds = ref([])
 const isLoading = ref(true)
 const errorMessage = ref('')
 const debugInfo = ref('')
+
+// Computed properties para debugging
+const hasToken = computed(() => {
+  if (typeof window !== 'undefined' && window.localStorage) {
+    return !!localStorage.getItem('access_token')
+  }
+  return false
+})
+
+const tokenStatus = computed(() => {
+  return hasToken.value ? '✅ Existe' : '❌ No existe'
+})
 
 // Verificar autenticación al cargar
 onMounted(async () => {
@@ -32,7 +45,7 @@ onMounted(async () => {
   debugInfo.value = `
     Usuario autenticado: ${user.value?.email || 'No disponible'}
     User ID: ${getUserId() || 'No disponible'}
-    Token existe: ${!!localStorage.getItem('access_token')}
+    Token existe: ${hasToken.value}
   `
   
   if (!isAuthenticated.value) {
@@ -121,15 +134,6 @@ const getCurrencySeverity = (currency) => {
 }
 
 // Funciones de navegación
-const goToCreateBond = () => {
-  router.push('/bonds/register')
-}
-
-const handleLogout = () => {
-  logout()
-  router.push('/login')
-}
-
 const refreshBonds = () => {
   loadUserBonds()
 }
@@ -154,28 +158,15 @@ const testWithDifferentUser = async () => {
 </script>
 
 <template>
-    <div class="min-h-screen bg-gray-50 py-8">
-        <div class="max-w-7xl mx-auto px-4">
-            <!-- Header -->
-            <div class="mb-8 flex justify-between items-center">
-                <div>
-                    <h1 class="text-3xl font-bold text-gray-900 mb-2">Mis Bonos</h1>
-                    <p class="text-gray-600">Lista de bonos registrados para tu cuenta</p>
-                </div>
-                <div class="flex gap-4">
-                    <Button 
-                        label="Nuevo Bono" 
-                        @click="goToCreateBond"
-                        icon="pi pi-plus"
-                    />
-                    <Button 
-                        label="Cerrar Sesión" 
-                        severity="secondary"
-                        @click="handleLogout"
-                        icon="pi pi-sign-out"
-                    />
-                </div>
-            </div>
+    <div class="min-h-screen bg-gray-50">
+        <!-- Menu Bar -->
+        <MenuBar 
+            title="Mis Bonos"
+            subtitle="Lista de bonos registrados para tu cuenta"
+            :show-create-button="true"
+        />
+        
+        <div class="max-w-7xl mx-auto px-4 py-8">
 
             <!-- Debug Info Card -->
             <Card class="mb-6 bg-yellow-50 border-yellow-200">
@@ -189,7 +180,7 @@ const testWithDifferentUser = async () => {
                     <div class="text-sm space-y-2">
                         <div><strong>Usuario:</strong> {{ user?.email || 'No disponible' }}</div>
                         <div><strong>ID Usuario:</strong> <code class="bg-gray-100 px-2 py-1 rounded">{{ getUserId() || 'No disponible' }}</code></div>
-                        <div><strong>Token:</strong> {{ localStorage.getItem('access_token') ? '✅ Existe' : '❌ No existe' }}</div>
+                        <div><strong>Token:</strong> {{ tokenStatus }}</div>
                         <div><strong>Endpoint consulta:</strong> <code class="bg-gray-100 px-2 py-1 rounded text-xs">GET /bonds?user_id=eq.{{ getUserId() }}</code></div>
                         <div><strong>Bonos encontrados:</strong> {{ bonds.length }}</div>
                         
@@ -350,21 +341,21 @@ const testWithDifferentUser = async () => {
                                     severity="info"
                                     size="small"
                                     @click="() => console.log('Ver detalle:', data)"
-                                    v-tooltip.top="'Ver detalle'"
+                                    title="Ver detalle"
                                 />
                                 <Button 
                                     icon="pi pi-pencil" 
                                     severity="warning"
                                     size="small"
                                     @click="() => console.log('Editar:', data)"
-                                    v-tooltip.top="'Editar'"
+                                    title="Editar"
                                 />
                                 <Button 
                                     icon="pi pi-trash" 
                                     severity="danger"
                                     size="small"
                                     @click="() => console.log('Eliminar:', data)"
-                                    v-tooltip.top="'Eliminar'"
+                                    title="Eliminar"
                                 />
                             </div>
                         </template>

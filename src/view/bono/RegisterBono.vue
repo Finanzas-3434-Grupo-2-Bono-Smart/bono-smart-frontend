@@ -10,9 +10,10 @@ import Textarea from 'primevue/textarea'
 import Message from 'primevue/message'
 import BondService from '@/service/BondService'
 import { useAuth } from '@/composables/useAuth'
+import MenuBar from '@/components/MenuBar.vue'
 
 const router = useRouter()
-const { user, isAuthenticated, getUserId, logout } = useAuth()
+const { user, isAuthenticated, getUserId } = useAuth()
 
 // Verificar autenticación al cargar
 onMounted(() => {
@@ -157,39 +158,18 @@ const syncValorComercial = () => {
     bondData.value.valor_comercial = bondData.value.valor_nominal
   }
 }
-
-// Función para logout
-const handleLogout = () => {
-  logout()
-  router.push('/login')
-}
 </script>
 
 <template>
-    <div class="min-h-screen bg-gray-50 py-8">
-        <div class="max-w-4xl mx-auto px-4">
-            <!-- Header -->
-            <div class="mb-8 flex justify-between items-center">
-                <div>
-                    <h1 class="text-3xl font-bold text-gray-900 mb-2">Registrar Nuevo Bono</h1>
-                    <p class="text-gray-600">Complete la información del bono que desea registrar</p>
-                </div>
-                <div class="flex gap-4">
-                    <Button 
-                        label="Ver Mis Bonos" 
-                        severity="info"
-                        @click="router.push('/bonds/list')"
-                        icon="pi pi-list"
-                    />
-                    <Button 
-                        label="Cerrar Sesión" 
-                        severity="secondary"
-                        size="small"
-                        @click="handleLogout"
-                        icon="pi pi-sign-out"
-                    />
-                </div>
-            </div>
+    <div class="min-h-screen bg-gray-50">
+        <!-- Menu Bar -->
+        <MenuBar 
+            title="Registrar Nuevo Bono"
+            subtitle="Complete la información del bono que desea registrar"
+            :show-list-button="true"
+        />
+        
+        <div class="max-w-4xl mx-auto px-4 py-8">
 
             <!-- Messages -->
             <div v-if="errorMessage" class="mb-6">

@@ -5,7 +5,7 @@ class BondService {
     if (!config.supabase.url || !config.supabase.anonKey) {
       throw new Error('Missing Supabase configuration. Please check your environment variables.')
     }
-    this.baseURL = `${config.supabase.url}/rest/v1`
+    this.baseURL = config.supabase.restUrl
     this.apiKey = config.supabase.anonKey
   }
 
