@@ -2,16 +2,16 @@ import { config } from '@/config/env'
 
 class AuthService {
   constructor() {
-    if (!config.api.baseURL || !config.supabase.anonKey) {
-      throw new Error('Missing Supabase configuration. Please check your environment variables.')
+    if (!config.supabase.url || !config.supabase.anonKey) {
+      throw new Error('Missing Supabase configuration.')
     }
-    this.baseURL = config.api.baseURL
+    this.authURL = `${config.supabase.url}/auth/v1`
     this.apiKey = config.supabase.anonKey
   }
 
   async makeRequest(endpoint, options = {}) {
-    const url = `${this.baseURL}${endpoint}`
-    
+    const url = `${this.authURL}${endpoint}`
+
     const requestConfig = {
       headers: {
         'Content-Type': 'application/json',
@@ -26,7 +26,7 @@ class AuthService {
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.message || `HTTP error! status: ${response.status}`)
+        throw new Error(data.error?.message || `HTTP error! status: ${response.status}`)
       }
 
       return {
@@ -34,7 +34,7 @@ class AuthService {
         data
       }
     } catch (error) {
-      console.error('API Request failed:', error)
+      console.error('Auth request failed:', error)
       return {
         success: false,
         error: error.message
@@ -45,21 +45,30 @@ class AuthService {
   async register(email, password) {
     return await this.makeRequest('/signup', {
       method: 'POST',
-      body: JSON.stringify({
-        email,
-        password
-      })
+      body: JSON.stringify({ email, password })
     })
   }
 
   async login(email, password) {
-    return await this.makeRequest('/token?grant_type=password', {
+    const result = await this.makeRequest('/token?grant_type=password', {
       method: 'POST',
-      body: JSON.stringify({
-        email,
-        password
-      })
+      body: JSON.stringify({ email, password })
     })
+
+    if (result.success) {
+      const userId = result.data.user?.id
+      if (userId) localStorage.setItem('user_id', userId)
+    }
+
+    return result
+  }
+
+  logout() {
+    localStorage.removeItem('user_id')
+  }
+
+  getUserId() {
+    return localStorage.getItem('user_id')
   }
 }
 
