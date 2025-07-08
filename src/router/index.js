@@ -30,6 +30,12 @@ const router = createRouter({
             name: 'bond-list',
             component: () => import('@/view/lista-bono/ListaBonos.vue'),
             meta: { requiresAuth: true }
+        },
+        {
+            path: '/bonds/flow',
+            name: 'bond-flow',
+            component: () => import('@/view/flujo-bono/FlujoBono.vue'),
+            meta: { requiresAuth: true }
         }
     ]
 })

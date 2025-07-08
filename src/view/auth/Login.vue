@@ -34,13 +34,12 @@ const handleLogin = async () => {
 
   try {
     const result = await AuthService.login(email.value, password.value)
-    
+
     if (result.success) {
-      // Guardar datos de autenticación
       setAuthData(result.data)
-      
-      // Redirigir a la lista de bonos
-      router.push('/bonds/list')
+
+      // ✅ Redirección segura
+      await router.push('/bonds/list').catch(() => {})
     } else {
       errorMessage.value = result.error || 'Invalid credentials. Please try again.'
     }
@@ -52,11 +51,12 @@ const handleLogin = async () => {
   }
 }
 
+
 // Verificar si ya está autenticado
 onMounted(() => {
   initializeAuth()
   if (isAuthenticated.value) {
-    router.push('/bonds/list')
+
   }
 })
 </script>

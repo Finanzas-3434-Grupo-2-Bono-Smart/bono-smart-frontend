@@ -69,22 +69,35 @@ const frecuenciaPagoOptions = ref([
   { label: 'Anual', value: 1 }
 ])
 
+const frecuenciaCapitalizacionOptions = ref([
+  { label: 'Mensual', value: 12 },
+  { label: 'Bimestral', value: 6 },
+  { label: 'Trimestral', value: 4 },
+  { label: 'Semestral', value: 2 },
+  { label: 'Anual', value: 1 }
+])
+
 const plazoGraciaOptions = ref([
   { label: 'Total', value: 'total' },
   { label: 'Parcial', value: 'parcial' },
-  { label: 'Sin gracia', value: 'sin_gracia' }
+  { label: 'Sin gracia', value: 'sin gracia' }
 ])
 
 // Validaciones
 const isFormValid = computed(() => {
-  return bondData.value.nombre.trim() !== '' &&
-         bondData.value.tasa > 0 &&
-         bondData.value.plazo_meses > 0 &&
-         bondData.value.valor_nominal > 0 &&
-         bondData.value.valor_comercial > 0 &&
-         bondData.value.fecha_emision &&
-         bondData.value.porcentaje_retencion >= 0
+  const data = bondData.value
+  const isNominal = data.tipo_tasa === 'nominal'
+
+  return data.nombre.trim() !== '' &&
+      data.tasa > 0 &&
+      data.plazo_meses > 0 &&
+      data.valor_nominal > 0 &&
+      data.valor_comercial > 0 &&
+      data.fecha_emision &&
+      data.porcentaje_retencion >= 0 &&
+      (!isNominal || data.frecuencia_capitalizacion) // solo si es nominal
 })
+
 
 // Funciones
 const handleSubmit = async () => {
@@ -243,7 +256,24 @@ const syncValorComercial = () => {
                         />
                     </div>
 
-                    <!-- Tasa (%) -->
+                  <!-- Frecuencia de Capitalización (solo si tipo_tasa es nominal) -->
+                  <div class="flex flex-col gap-2" v-if="bondData.tipo_tasa === 'nominal'">
+                    <label for="frecuencia_capitalizacion" class="font-medium text-gray-700">
+                      Frecuencia de Capitalización <span class="text-red-500">*</span>
+                    </label>
+                    <Dropdown
+                        id="frecuencia_capitalizacion"
+                        v-model="bondData.frecuencia_capitalizacion"
+                        :options="frecuenciaCapitalizacionOptions"
+                        option-label="label"
+                        option-value="value"
+                        placeholder="Seleccionar frecuencia"
+                        :disabled="isLoading"
+                    />
+                  </div>
+
+
+                  <!-- Tasa (%) -->
                     <div class="flex flex-col gap-2">
                         <label for="tasa" class="font-medium text-gray-700">
                             Tasa (%) <span class="text-red-500">*</span>

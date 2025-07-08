@@ -18,5 +18,10 @@ app.use(PrimeVue, {
         }
     }
 })
+console.log('URL:', import.meta.env.VITE_SUPABASE_URL)
+console.log('KEY:', import.meta.env.VITE_SUPABASE_ANON_KEY)
+console.log('REST:', import.meta.env.VITE_SUPABASE_REST_URL)
+console.log('API:', import.meta.env.VITE_API_BASE_URL)
+
 
 app.mount('#app')

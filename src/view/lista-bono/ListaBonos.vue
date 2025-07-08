@@ -21,6 +21,10 @@ const isLoading = ref(true)
 const errorMessage = ref('')
 const debugInfo = ref('')
 
+const goToCreateBond = () => {
+  router.push('/bonds/register')
+}
+
 // Computed properties para debugging
 const hasToken = computed(() => {
   if (typeof window !== 'undefined' && window.localStorage) {
@@ -56,6 +60,11 @@ onMounted(async () => {
   
   await loadUserBonds()
 })
+
+function goToBondFlow(bondId) {
+  router.push({ name: 'bond-flow', query: { bond_id: bondId } })
+}
+
 
 // Cargar bonos del usuario
 const loadUserBonds = async () => {
@@ -155,6 +164,28 @@ const testWithDifferentUser = async () => {
     console.error('Test error:', error)
   }
 }
+
+const deleteBondById = async (bondId) => {
+  const confirmed = confirm('¿Estás seguro de que deseas eliminar este bono?')
+  if (!confirmed) return
+
+  try {
+    const result = await BondService.deleteBond(bondId)
+
+    if (result.success) {
+      // Eliminar bono localmente para evitar recarga completa
+      bonds.value = bonds.value.filter(b => b.id !== bondId)
+      console.log(`✅ Bono ${bondId} eliminado correctamente.`)
+    } else {
+      console.error(`❌ Error al eliminar el bono ${bondId}:`, result.error)
+      errorMessage.value = `Error al eliminar el bono: ${result.error}`
+    }
+  } catch (error) {
+    console.error('❌ Error inesperado al eliminar bono:', error)
+    errorMessage.value = 'Error inesperado al eliminar el bono.'
+  }
+}
+
 </script>
 
 <template>
@@ -336,12 +367,12 @@ const testWithDifferentUser = async () => {
                     <Column header="Acciones" :exportable="false">
                         <template #body="{ data }">
                             <div class="flex gap-2">
-                                <Button 
-                                    icon="pi pi-eye" 
-                                    severity="info"
-                                    size="small"
-                                    @click="() => console.log('Ver detalle:', data)"
-                                    title="Ver detalle"
+                                <Button
+                                  icon="pi pi-eye"
+                                  severity="info"
+                                  size="small"
+                                  @click="() => goToBondFlow(data.id)"
+                                  title="Ver detalle"
                                 />
                                 <Button 
                                     icon="pi pi-pencil" 
@@ -350,12 +381,12 @@ const testWithDifferentUser = async () => {
                                     @click="() => console.log('Editar:', data)"
                                     title="Editar"
                                 />
-                                <Button 
-                                    icon="pi pi-trash" 
-                                    severity="danger"
-                                    size="small"
-                                    @click="() => console.log('Eliminar:', data)"
-                                    title="Eliminar"
+                                <Button
+                                  icon="pi pi-trash"
+                                  severity="danger"
+                                  size="small"
+                                  @click="() => deleteBondById(data.id)"
+                                  title="Eliminar"
                                 />
                             </div>
                         </template>
