@@ -161,7 +161,8 @@ const resetForm = () => {
     valor_comercial: null,
     fecha_emision: new Date(),
     plazo_gracia: 'total',
-    porcentaje_retencion: 0.05
+    porcentaje_retencion: 0.05,
+    tiempo_gracia: 0
   }
 }
 
@@ -394,6 +395,22 @@ const syncValorComercial = () => {
                             :disabled="isLoading"
                         />
                     </div>
+
+                  <!-- Tiempo de Gracia -->
+                  <div class="flex flex-col gap-2">
+                    <label for="tiempo_gracia" class="font-medium text-gray-700">
+                      Tiempo de Gracia
+                    </label>
+                    <InputNumber
+                        id="tiempo_gracia"
+                        v-model="bondData.tiempo_gracia"
+                        :min="0"
+                        :max="600"
+                        placeholder="0"
+                        :disabled="isLoading"
+                        suffix=" periodos"
+                    />
+                  </div>
 
                     <!-- Porcentaje de Retención -->
                     <div class="flex flex-col gap-2">

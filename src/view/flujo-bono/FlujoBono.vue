@@ -3,9 +3,10 @@ import { ref, onMounted } from 'vue'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Button from 'primevue/button'
-import Tag from 'primevue/tag'
 import Card from 'primevue/card'
 import MenuBar from '@/components/MenuBar.vue'
+import { useRoute } from 'vue-router'
+const route = useRoute()
 
 import FlowBondService from '@/service/FlowBondService'
 
@@ -19,6 +20,7 @@ const totalIntereses = ref(0)
 const totalCuota = ref(0)
 const totalFlujoEmisor = ref(0)
 const totalFlujoInversor = ref(0)
+const bondName = ref(route.query.bond_name)
 
 async function loadFlows() {
   if (!bondId.value) return
@@ -64,8 +66,7 @@ function formatDate(dateString) {
   return isNaN(d) ? dateString : d.toLocaleDateString('es-PE')
 }
 
-import { useRoute } from 'vue-router'
-const route = useRoute()
+
 bondId.value = route.query.bond_id
 
 onMounted(() => {
@@ -95,7 +96,8 @@ function refreshFlows() {
         <template #content>
           <div class="text-sm space-y-2">
             <div><strong>ID del Bono:</strong> <code class="bg-gray-100 px-2 py-1 rounded">{{ bondId }}</code></div>
-            <div><strong>Total Flujos:</strong> {{ bondFlows.length }}</div>
+            <div><strong>Nombre del Bono:</strong> <code class="bg-gray-100 px-2 py-1 rounded">{{ bondName }}</code></div>
+            <div><strong>N° de Periodos:</strong> {{ bondFlows.length }}</div>
             <div><strong>Última Actualización:</strong> {{ new Date().toLocaleString('es-PE') }}</div>
           </div>
         </template>
@@ -103,7 +105,10 @@ function refreshFlows() {
 
       <div class="bg-white rounded-lg shadow-lg overflow-hidden mb-10">
         <div class="p-6 border-b border-gray-200 flex justify-between items-center">
-          <h2 class="text-lg font-semibold text-gray-900">Cronograma de pagos</h2>
+          <div class="flex items-center gap-2">
+            <i class="pi pi-calendar text-green-700"></i>
+            <span class="text-green-700">Cronograma de Bono</span>
+          </div>
           <Button
               label="Actualizar"
               icon="pi pi-refresh"
@@ -126,7 +131,7 @@ function refreshFlows() {
             :loading="isLoading"
             emptyMessage="No hay datos disponibles"
         >
-          <Column field="periodo" header="Cuota N°" sortable />
+          <Column field="periodo" header="N° Periodo" sortable />
           <Column field="fecha_pago" header="Fecha Pago" sortable>
             <template #body="{ data }">
               {{ formatDate(data.fecha_pago) }}
@@ -164,7 +169,10 @@ function refreshFlows() {
 
       <div v-if="bondMetrics" class="bg-white rounded-lg shadow-lg overflow-hidden">
         <div class="p-6 border-b border-gray-200">
-          <h2 class="text-lg font-semibold text-gray-900">Métricas del Bono</h2>
+          <div class="flex items-center gap-2">
+            <i class="pi pi-percentage text-cyan-700"></i>
+            <span class="text-cyan-700">Cronograma de Bono</span>
+          </div>
         </div>
         <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
           <div><strong>TCEA:</strong> {{ formatNumber(bondMetrics.tcea * 100) }}%</div>

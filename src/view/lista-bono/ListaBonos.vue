@@ -61,9 +61,10 @@ onMounted(async () => {
   await loadUserBonds()
 })
 
-function goToBondFlow(bondId) {
-  router.push({ name: 'bond-flow', query: { bond_id: bondId } })
+function goToBondFlow(bondId, bondName) {
+  router.push({ name: 'bond-flow', query: { bond_id: bondId, bond_name: bondName } })
 }
+
 
 
 // Cargar bonos del usuario
@@ -367,14 +368,14 @@ const deleteBondById = async (bondId) => {
                     <Column header="Acciones" :exportable="false">
                         <template #body="{ data }">
                             <div class="flex gap-2">
-                                <Button
+                              <Button
                                   icon="pi pi-eye"
                                   severity="info"
                                   size="small"
-                                  @click="() => goToBondFlow(data.id)"
+                                  @click="() => goToBondFlow(data.id, data.nombre)"
                                   title="Ver detalle"
-                                />
-                                <Button 
+                              />
+                              <Button
                                     icon="pi pi-pencil" 
                                     severity="warning"
                                     size="small"
