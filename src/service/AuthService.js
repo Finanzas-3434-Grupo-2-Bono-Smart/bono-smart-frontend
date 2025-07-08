@@ -26,7 +26,7 @@ class AuthService {
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error?.message || `HTTP error! status: ${response.status}`)
+        throw new Error(data.error?.message || `Error, inicio de sesión: ${response.status}`)
       }
 
       return {
